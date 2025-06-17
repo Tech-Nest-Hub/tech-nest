@@ -82,7 +82,7 @@ export const mainLinks = [
   },
   {
     title: "Linkedin",
-    icon: <FaLinkedin className="w-8 h-8 text-black" />,
+    icon: <FaLinkedin className="w-8 h-8 text-blue-500" />,
     url: "https://www.linkedin.com/company/tech-nest-hub",
     description: "Follow our company for employement opportunities",
   },
