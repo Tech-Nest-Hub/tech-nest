@@ -1,89 +1,20 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Instagram, Facebook, Twitter, Youtube, MessageCircle, Send, MoreHorizontal, ExternalLink } from "lucide-react"
+import { MoreHorizontal, ExternalLink } from "lucide-react"
+import logo from '@/assets/technest.jpg'
+import { socialLinks,mainLinks } from "./data"
+function SocialLinks() {
 
-export default function Component() {
-  const socialLinks = [
-    {
-      name: "Instagram",
-      icon: <Instagram className="w-5 h-5" />,
-      url: "#",
-      color: "bg-gradient-to-r from-purple-500 to-pink-500",
-    },
-    {
-      name: "Facebook",
-      icon: <Facebook className="w-5 h-5" />,
-      url: "#",
-      color: "bg-blue-600",
-    },
-    {
-      name: "Twitter",
-      icon: <Twitter className="w-5 h-5" />,
-      url: "#",
-      color: "bg-black",
-    },
-    {
-      name: "YouTube",
-      icon: <Youtube className="w-5 h-5" />,
-      url: "#",
-      color: "bg-red-600",
-    },
-    {
-      name: "Discord",
-      icon: <MessageCircle className="w-5 h-5" />,
-      url: "#",
-      color: "bg-indigo-600",
-    },
-    {
-      name: "Telegram",
-      icon: <Send className="w-5 h-5" />,
-      url: "#",
-      color: "bg-blue-500",
-    },
-  ]
-
-  const mainLinks = [
-    {
-      title: "Tech Nest Discord Server",
-      icon: <MessageCircle className="w-8 h-8 text-indigo-600" />,
-      url: "#",
-      description: "Join our community discussions",
-    },
-    {
-      title: "Tech Nest Telegram",
-      icon: <Send className="w-8 h-8 text-blue-500" />,
-      url: "#",
-      description: "Get instant updates and news",
-    },
-    {
-      title: "YouTube",
-      icon: <Youtube className="w-8 h-8 text-red-600" />,
-      url: "#",
-      description: "Watch our latest tech content",
-    },
-    {
-      title: "Facebook",
-      icon: <Facebook className="w-8 h-8 text-blue-600" />,
-      url: "#",
-      description: "Follow us for daily updates",
-    },
-    {
-      title: "Instagram",
-      icon: <Instagram className="w-8 h-8 text-pink-600" />,
-      url: "#",
-      description: "Behind the scenes content",
-    },
-  ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-200 to-gray-300 py-8 px-4">
       <div className="max-w-md mx-auto">
         {/* Header Section */}
         <div className="text-center mb-8">
           <div className="relative mb-4">
             <Avatar className="w-24 h-24 mx-auto border-4 border-white shadow-lg">
-              <AvatarImage src="/placeholder.svg?height=96&width=96" alt="Tech Nest Logo" />
+              <AvatarImage src={logo} alt="Tech Nest Logo" />
               <AvatarFallback className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 text-white">
                 TN
               </AvatarFallback>
@@ -161,3 +92,5 @@ export default function Component() {
     </div>
   )
 }
+
+export default SocialLinks;
