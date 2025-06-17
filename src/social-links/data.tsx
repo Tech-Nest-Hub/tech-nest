@@ -1,4 +1,4 @@
-import { FaDiscord, } from "react-icons/fa"
+import { FaDiscord, FaLinkedin, } from "react-icons/fa"
 import { Send } from "lucide-react";
 import { BsFacebook, BsInstagram, BsTelegram, BsYoutube } from "react-icons/bs";
 import { FaXTwitter } from "react-icons/fa6";
@@ -78,6 +78,12 @@ export const mainLinks = [
     title: "Twitter",
     icon: <FaXTwitter className="w-8 h-8 text-black" />,
     url: "http://x.com/TechNest1159276",
-    description: "Get the updates here",
+    description: "Follow to join the giveaways and more",
+  },
+  {
+    title: "Linkedin",
+    icon: <FaLinkedin className="w-8 h-8 text-black" />,
+    url: "https://www.linkedin.com/company/tech-nest-hub",
+    description: "Follow our company for employement opportunities",
   },
 ]
