@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { MoreHorizontal, ExternalLink } from "lucide-react"
+import {  ExternalLink } from "lucide-react"
 import logo from '@/assets/technest.jpg'
 import { socialLinks,mainLinks } from "./data"
 function SocialLinks() {
@@ -9,7 +9,7 @@ function SocialLinks() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-200 to-gray-300 py-8 px-4">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md mx-auto mt-8">
         {/* Header Section */}
         <div className="text-center mb-8">
           <div className="relative mb-4">
@@ -19,13 +19,7 @@ function SocialLinks() {
                 TN
               </AvatarFallback>
             </Avatar>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white shadow-md hover:shadow-lg"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
+           
           </div>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Tech Nest</h1>
