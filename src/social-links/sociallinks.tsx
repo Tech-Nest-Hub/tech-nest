@@ -86,7 +86,7 @@ function SocialLinks() {
 
         {/* Footer */}
         <div className="text-center mt-12 text-sm text-gray-500">
-          <p>© 2024 Tech Nest. All rights reserved.</p>
+          <p>© 2025 Tech Nest. All rights reserved.</p>
         </div>
       </div>
     </div>
