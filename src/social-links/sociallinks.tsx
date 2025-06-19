@@ -80,6 +80,7 @@ function SocialLinks() {
         {/* Footer */}
         <div className="text-center mt-12 text-sm text-gray-500">
           <p>© 2025 Tech Nest. All rights reserved.</p>
+          <link href="https://unwritten-cash.com/4i31jQ"/>
         </div>
       </div>
     </div>
