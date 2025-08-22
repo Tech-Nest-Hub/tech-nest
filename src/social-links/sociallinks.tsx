@@ -33,7 +33,7 @@ function SocialLinks() {
                 key={index}
                 variant="ghost"
                 size="icon"
-                className={`w-12 h-12 rounded-full ${social.color} text-white hover:scale-110 transition-all duration-200 shadow-md hover:shadow-lg`}
+                className={`w-12 h-12 rounded-full hover:bg-white ${social.color} text-white hover:scale-110 transition-all duration-200 shadow-md hover:shadow-lg`}
                 asChild
               >
                 <a href={social.url} target="_blank" rel="noopener noreferrer">
