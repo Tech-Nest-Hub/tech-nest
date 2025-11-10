@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Facebook, Instagram, Twitter, Linkedin, Youtube, Mail, Phone, MapPin } from "lucide-react";
 
 export function Footer() {
-  // In a real app, you would get this from your router
   const [currentPath, setCurrentPath] = useState("/");
 
   const navItems = [
@@ -29,10 +28,9 @@ export function Footer() {
     { name: "FAQ", href: "/faq" },
   ];
 
-  // Navigation handler (would integrate with your router in a real app)
-  const handleNavigation = (path: any) => {
+  const handleNavigation = (path: string) => {
     setCurrentPath(path);
-    // In a real app, you would use your router here:
+    // In a real app, you would integrate with your router:
     // window.history.pushState({}, "", path);
   };
 
@@ -45,10 +43,12 @@ export function Footer() {
             {/* Company Info */}
             <div className="space-y-4">
               <div onClick={() => handleNavigation("/")} className="cursor-pointer">
-                <h2 className="text-2xl font-black font-montserrat bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Tech Nest</h2>
+                <h2 className="text-2xl font-black font-montserrat bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Tech Nest
+                </h2>
               </div>
               <p className="text-muted-foreground font-open-sans">
-                Empowering businesses with cutting-edge technology solutions. 
+                Empowering businesses with cutting-edge technology solutions.
                 We turn your digital dreams into reality.
               </p>
               <div className="flex space-x-4">
@@ -82,7 +82,11 @@ export function Footer() {
                         e.preventDefault();
                         handleNavigation(item.href);
                       }}
-                      className="text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-open-sans"
+                      className={`font-open-sans transition-colors ${
+                        currentPath === item.href
+                          ? "text-blue-600 dark:text-blue-400 font-semibold"
+                          : "text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                      }`}
                     >
                       {item.name}
                     </a>
@@ -103,7 +107,11 @@ export function Footer() {
                         e.preventDefault();
                         handleNavigation(item.href);
                       }}
-                      className="text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-open-sans"
+                      className={`font-open-sans transition-colors ${
+                        currentPath === item.href
+                          ? "text-blue-600 dark:text-blue-400 font-semibold"
+                          : "text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                      }`}
                     >
                       {item.name}
                     </a>
@@ -157,7 +165,11 @@ export function Footer() {
                   e.preventDefault();
                   handleNavigation("/privacy");
                 }}
-                className="text-sm text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-open-sans"
+                className={`text-sm font-open-sans transition-colors ${
+                  currentPath === "/privacy"
+                    ? "text-blue-600 dark:text-blue-400 font-semibold"
+                    : "text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                }`}
               >
                 Privacy Policy
               </a>
@@ -167,7 +179,11 @@ export function Footer() {
                   e.preventDefault();
                   handleNavigation("/terms");
                 }}
-                className="text-sm text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-open-sans"
+                className={`text-sm font-open-sans transition-colors ${
+                  currentPath === "/terms"
+                    ? "text-blue-600 dark:text-blue-400 font-semibold"
+                    : "text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                }`}
               >
                 Terms of Service
               </a>
@@ -175,8 +191,8 @@ export function Footer() {
           </div>
         </div>
       </div>
-
-
     </footer>
   );
 }
+
+export default Footer
