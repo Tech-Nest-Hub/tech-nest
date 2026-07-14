@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Navbar } from "./components/NavBar";
+// import { Navbar } from "./components/NavBar";
 import SocialLinks from "./social-links/sociallinks";
-import { Footer } from "./components/Footer";
+// import { Footer } from "./components/Footer";
 import Blogs from "./pages/blogs/BlogsViewPage";
 import BlogSlugViewPage from "./pages/blogs/BlogSlugViewPage";
 
