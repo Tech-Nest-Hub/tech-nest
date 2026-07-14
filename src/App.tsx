@@ -9,7 +9,7 @@ export default function App() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-gray-200 to-gray-300">
-        <Navbar />
+        {/* <Navbar /> */}
         <BrowserRouter>
           <Routes location={""}>
 
@@ -22,7 +22,7 @@ export default function App() {
           </Routes>
         </BrowserRouter>
             {/* <SocialLinks /> */}
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </>
   );
