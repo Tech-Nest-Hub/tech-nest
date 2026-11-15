@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-// Must match the step ids in app/form/page.tsx (and FIELDS in apps-script.gs)
+// Must match the step ids in form/data.ts (and FIELDS in apps-script.gs)
 const FIELDS = [
   "name",
   "email",
@@ -29,7 +29,13 @@ export async function POST(req: Request) {
   }
 
   const url = process.env.SHEETS_WEBHOOK_URL;
+  console.log("Sheets configuration:", {
+    urlConfigured: Boolean(url),
+    secretConfigured: Boolean(process.env.SHEETS_SECRET),
+    secretLength: process.env.SHEETS_SECRET?.length ?? 0,
+  });
   if (!url) {
+    console.error("SHEETS_WEBHOOK_URL is missing. Add it to .env.local and restart `npm run dev`.");
     return NextResponse.json({ ok: false, error: "Not configured" }, { status: 500 });
   }
 
@@ -46,10 +52,30 @@ export async function POST(req: Request) {
       body: JSON.stringify(row),
       redirect: "follow",
     });
-    if (!res.ok) throw new Error(`Sheet responded ${res.status}`);
+
+    // Apps Script answers 200 even on failure, so read what it actually said.
+    const text = await res.text();
+    let json: { ok?: boolean; error?: string } | null = null;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      /* not JSON → probably a Google login/error page */
+    }
+
+    if (!res.ok || !json?.ok) {
+      console.error(
+        "Sheet webhook failed →",
+        res.status,
+        json?.error ?? text.slice(0, 300)
+      );
+      return NextResponse.json(
+        { ok: false, error: json?.error ?? "Sheet did not accept the data" },
+        { status: 502 }
+      );
+    }
     return NextResponse.json({ ok: true });
   } catch (e) {
-    console.error("Sheet write failed", e);
+    console.error("Sheet webhook request error", e);
     return NextResponse.json({ ok: false }, { status: 502 });
   }
 }
