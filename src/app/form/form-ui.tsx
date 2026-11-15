@@ -74,43 +74,44 @@ const lineInput =
 export function Welcome({ dir, onStart }: { dir: number; onStart: () => void }) {
   return (
     <Group dir={dir}>
-
-      <Rise>
-        <div className="flex flex-row items-center gap-2">
-          <Avatar className="w-24 h-24 rounded-none">
-            <AvatarImage src={logo.src} alt="Tech Nest Logo" className={``}/>
-            <AvatarFallback className="text-2xl font-bold bg-linear-to-r from-blue-500 to-teal-500 text-white">
-              TN
-            </AvatarFallback>
-          </Avatar>
-        <p className="mb-4 text-7xl font-medium text-[#262627]/70">
-            Tech Nest
-        </p>
-        </div>
-      </Rise>
-      <Rise>
-        <h1 className="text-4xl font-light leading-tight sm:text-5xl">
-          Let's plan your project
-        </h1>
-      </Rise>
-      <Rise>
-        <p className="mt-4 max-w-lg text-lg text-[#262627]/70">
-          A few quick questions so I understand what you need. Most are just
-          taps. You'll be done in about 3 minutes.
-        </p>
-      </Rise>
-      <Rise className="mt-8 flex flex-col items-start gap-3">
-        <Button
-          size="lg"
-          onClick={onStart}
-          className="h-12 rounded-lg bg-[#262627] px-8 text-base font-semibold text-white transition-transform hover:bg-[#262627]/85 active:scale-95"
-        >
-          Start
-        </Button>
-        <span className="flex items-center gap-1.5 text-sm text-[#262627]/70">
+      <div className="flex flex-col items-center">
+        <Rise>
+          <div className="flex flex-row items-center gap-2">
+            <Avatar className="w-24 h-24 rounded-none">
+              <AvatarImage src={logo.src} alt="Tech Nest Logo" className={``} />
+              <AvatarFallback className="text-2xl font-bold bg-linear-to-r from-blue-500 to-teal-500 text-white">
+                TN
+              </AvatarFallback>
+            </Avatar>
+            <p className="mb-4 text-5xl sm:text-5xl md:text-7xl font-medium text-[#262627]/70">
+              Tech Nest
+            </p>
+          </div>
+        </Rise>
+        <Rise>
+          <h1 className="text-4xl font-light leading-tight sm:text-5xl">
+            Let's plan your project
+          </h1>
+        </Rise>
+        <Rise>
+          <p className="mt-4 max-w-lg text-lg text-[#262627]/70">
+            A few quick questions so I understand what you need. Most are just
+            taps. You'll be done in about 3 minutes.
+          </p>
+        </Rise>
+        <Rise className="mt-8 flex flex-col items-start gap-3">
+          <Button
+            size="lg"
+            onClick={onStart}
+            className="h-12 w-40 rounded-lg bg-[#262627] px-8 text-base font-semibold text-white transition-transform hover:bg-[#262627]/85 active:scale-95"
+          >
+            Start
+          </Button>
+        </Rise>
+        <span className="mt-2 flex items-center gap-1.5 text-sm text-[#262627]/70">
           <Clock className="size-4" /> Takes 3 minutes
         </span>
-      </Rise>
+      </div>
     </Group >
   );
 }
