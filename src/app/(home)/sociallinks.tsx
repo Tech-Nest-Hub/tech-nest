@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ExternalLink } from "lucide-react"
-import logo from '@/assets/technest.jpg'
+import logo from '@/../public/technest.jpg'
 import { socialLinks, mainLinks } from "./socialdata"
 
 function SocialLinks() {
@@ -13,7 +13,7 @@ function SocialLinks() {
         <div className="text-center mb-8">
           <div className="relative mb-4">
             <Avatar className="w-24 h-24 mx-auto border-4 border-white shadow-lg">
-              <AvatarImage src={logo} alt="Tech Nest Logo" />
+              <AvatarImage src={logo.src} alt="Tech Nest Logo" />
               <AvatarFallback className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 text-white">
                 TN
               </AvatarFallback>
@@ -34,7 +34,6 @@ function SocialLinks() {
                 variant="ghost"
                 size="icon"
                 className={`w-12 h-12 rounded-full hover:bg-white ${social.color} text-white hover:scale-110 transition-all duration-200 shadow-md hover:shadow-lg`}
-                asChild
               >
                 <a href={social.url} target="_blank" rel="noopener noreferrer">
                   {social.icon}
