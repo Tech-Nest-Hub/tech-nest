@@ -7,14 +7,14 @@ import { socialLinks, mainLinks } from "./socialdata"
 
 function SocialLinks() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-200 to-gray-300 py-8 px-4">
+    <div className="min-h-screen bg-linear-to-br from-gray-200 to-gray-300 py-8 px-4">
       <div className="max-w-md mx-auto mt-8">
         {/* Header Section */}
         <div className="text-center mb-8">
           <div className="relative mb-4">
             <Avatar className="w-24 h-24 mx-auto border-4 border-white shadow-lg">
               <AvatarImage src={logo.src} alt="Tech Nest Logo" />
-              <AvatarFallback className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 text-white">
+              <AvatarFallback className="text-2xl font-bold bg-linear-to-r from-blue-500 to-teal-500 text-white">
                 TN
               </AvatarFallback>
             </Avatar>
@@ -61,7 +61,7 @@ function SocialLinks() {
                   className="flex items-center justify-between w-full"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex-shrink-0">{link.icon}</div>
+                    <div className="shrink-0">{link.icon}</div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                         {link.title}
@@ -69,7 +69,7 @@ function SocialLinks() {
                       <p className="text-sm text-gray-500 mt-1">{link.description}</p>
                     </div>
                   </div>
-                  <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0" />
+                  <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" />
                 </a>
               </CardContent>
             </Card>

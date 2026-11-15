@@ -195,7 +195,7 @@ export function Question({
                     className={`flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-left text-lg transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#262627] ${
                       on
                         ? "border-[#262627] bg-[#262627]/10"
-                        : "border-[#262627]/30 bg-[#262627]/[0.04] hover:bg-[#262627]/10"
+                        : "border-[#262627]/30 bg-[#262627]/4 hover:bg-[#262627]/10"
                     }`}
                   >
                     <motion.span
