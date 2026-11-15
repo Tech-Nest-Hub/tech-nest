@@ -12,7 +12,10 @@ import {
   Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from '@/../public/technest.jpg'
+
 import { otherKey, type Answers, type Step } from "./data";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -71,8 +74,19 @@ const lineInput =
 export function Welcome({ dir, onStart }: { dir: number; onStart: () => void }) {
   return (
     <Group dir={dir}>
+
       <Rise>
-        <p className="mb-4 text-lg font-medium text-[#262627]/60">TechNest</p>
+        <div className="flex flex-row items-center gap-2">
+          <Avatar className="w-24 h-24 rounded-none">
+            <AvatarImage src={logo.src} alt="Tech Nest Logo" className={``}/>
+            <AvatarFallback className="text-2xl font-bold bg-linear-to-r from-blue-500 to-teal-500 text-white">
+              TN
+            </AvatarFallback>
+          </Avatar>
+        <p className="mb-4 text-7xl font-medium text-[#262627]/70">
+            Tech Nest
+        </p>
+        </div>
       </Rise>
       <Rise>
         <h1 className="text-4xl font-light leading-tight sm:text-5xl">
@@ -97,7 +111,7 @@ export function Welcome({ dir, onStart }: { dir: number; onStart: () => void }) 
           <Clock className="size-4" /> Takes 3 minutes
         </span>
       </Rise>
-    </Group>
+    </Group >
   );
 }
 
@@ -192,20 +206,18 @@ export function Question({
                     whileHover={{ x: 4 }}
                     whileTap={{ scale: 0.97 }}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className={`flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-left text-lg transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#262627] ${
-                      on
-                        ? "border-[#262627] bg-[#262627]/10"
-                        : "border-[#262627]/30 bg-[#262627]/4 hover:bg-[#262627]/10"
-                    }`}
+                    className={`flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-left text-lg transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#262627] ${on
+                      ? "border-[#262627] bg-[#262627]/10"
+                      : "border-[#262627]/30 bg-[#262627]/4 hover:bg-[#262627]/10"
+                      }`}
                   >
                     <motion.span
                       animate={{ scale: on ? [1, 1.3, 1] : 1 }}
                       transition={{ duration: 0.35, ease: EASE }}
-                      className={`inline-flex size-6 shrink-0 items-center justify-center rounded border text-xs font-semibold transition-colors duration-300 ${
-                        on
-                          ? "border-[#262627] bg-[#262627] text-white"
-                          : "border-[#262627]/40 bg-white"
-                      }`}
+                      className={`inline-flex size-6 shrink-0 items-center justify-center rounded border text-xs font-semibold transition-colors duration-300 ${on
+                        ? "border-[#262627] bg-[#262627] text-white"
+                        : "border-[#262627]/40 bg-white"
+                        }`}
                     >
                       {String.fromCharCode(65 + i)}
                     </motion.span>
