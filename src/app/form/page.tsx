@@ -1,15 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion, type Variants } from "framer-motion";
 import { getCalApi } from "@calcom/embed-react";
 import {
   AUTO_OPEN_BOOKING,
   CAL_LINK,
-  STEPS,
   buildPayload,
+  busyKey,
+  fileKey,
+  fileNameKey,
   otherKey,
   validate,
+  visibleSteps,
   type Answers,
 } from "./data";
 import { BackButton, Done, EASE, MobileBar, Question, Welcome } from "./form-ui";
@@ -36,10 +39,12 @@ export default function FormPage() {
   const [status, setStatus] = useState<Status>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const step = index >= 0 ? STEPS[index] : undefined;
-  const isLast = index === STEPS.length - 1;
+  // steps that apply to the answers so far (some are skipped, e.g. logo upload)
+  const steps = useMemo(() => visibleSteps(answers), [answers]);
+  const step = index >= 0 ? steps[index] : undefined;
+  const isLast = index === steps.length - 1;
   const progress =
-    status === "done" ? 100 : ((index + 1) / (STEPS.length + 1)) * 100;
+    status === "done" ? 100 : ((index + 1) / (steps.length + 1)) * 100;
   const firstName =
     typeof answers.name === "string" ? answers.name.trim().split(" ")[0] : "";
 
@@ -77,10 +82,13 @@ export default function FormPage() {
       const err = validate(step, a);
       if (err) return setError(err);
       setError(null);
-      if (isLast) submit(a);
+      // recompute with the newest answers: picking "Yes" on the logo question
+      // adds a step, so don't trust the `steps` from this render
+      const last = index === visibleSteps(a).length - 1;
+      if (last) submit(a);
       else go(index + 1);
     },
-    [step, status, answers, isLast, index, go, submit]
+    [step, status, answers, index, go, submit]
   );
 
   const choose = useCallback(
@@ -92,8 +100,8 @@ export default function FormPage() {
         const updated = { ...answers, [step.id]: option };
         setAnswers(updated);
         if (timer.current) clearTimeout(timer.current);
-        // "Something else" waits for the person to type; everything else auto-advances
-        if (option !== step.other) {
+        // "Something else" / "Upload it now" wait for the person; the rest auto-advance
+        if (option !== step.other && option !== step.upload) {
           timer.current = setTimeout(() => next(updated), 380);
         }
         return;
@@ -119,6 +127,16 @@ export default function FormPage() {
     setAnswers((a) => ({ ...a, [otherKey(step.id)]: v }));
     setError(null);
   };
+  const setFile = (url: string, name: string) => {
+    if (!step) return;
+    setAnswers((a) => ({ ...a, [fileKey(step.id)]: url, [fileNameKey(step.id)]: name }));
+    setError(null);
+  };
+  const setBusy = (busy: boolean) => {
+    if (!step) return;
+    setAnswers((a) => ({ ...a, [busyKey(step.id)]: busy ? "1" : "" }));
+  };
+  const clearFile = () => setFile("", "");
 
   /* ---- Cal.com: opens as a full-size popup instead of a cramped embed ---- */
   const openBooking = useCallback(async () => {
@@ -215,6 +233,9 @@ export default function FormPage() {
                   onText={setText}
                   onOther={setOther}
                   onChoose={choose}
+                  onFile={setFile}
+                  onBusy={setBusy}
+                  onClearFile={clearFile}
                   onNext={() => next()}
                 />
               ) : (

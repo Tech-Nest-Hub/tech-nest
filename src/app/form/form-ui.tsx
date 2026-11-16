@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import {
   ArrowRight,
@@ -10,12 +10,23 @@ import {
   Clock,
   House,
   Loader2,
+  Upload,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from '@/../public/technest.jpg'
+import logo from "@/../public/technest.jpg";
 
-import { otherKey, type Answers, type Step } from "./data";
+import {
+  DEFAULT_CURRENCY,
+  fileKey,
+  fileNameKey,
+  otherKey,
+  type Answers,
+  type Currency,
+  type Step,
+} from "./data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -112,7 +123,159 @@ export function Welcome({ dir, onStart }: { dir: number; onStart: () => void }) 
           <Clock className="size-4" /> Takes 3 minutes
         </span>
       </div>
-    </Group >
+    </Group>
+  );
+}
+
+/* ------------------------------ small pieces ------------------------------ */
+
+/** [ USD | NPR ] segmented toggle with a sliding pill */
+function CurrencyToggle({
+  value,
+  onChange,
+}: {
+  value: Currency;
+  onChange: (c: Currency) => void;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label="Currency"
+      className="relative inline-flex rounded-full bg-[#262627]/10 p-1"
+    >
+      {(["USD", "NPR"] as Currency[]).map((c) => (
+        <button
+          key={c}
+          type="button"
+          onClick={() => onChange(c)}
+          className="relative z-10 rounded-full px-5 py-1.5 text-sm font-semibold transition-colors duration-300"
+          style={{ color: value === c ? "#fff" : "rgba(38,38,39,0.65)" }}
+        >
+          {value === c && (
+            <motion.span
+              layoutId="currency-pill"
+              className="absolute inset-0 -z-10 rounded-full bg-[#262627]"
+              transition={{ type: "spring", stiffness: 500, damping: 36 }}
+            />
+          )}
+          {c}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Logo upload: sends the file to /api/upload (saved to Google Drive) */
+function FileDrop({
+  url,
+  name,
+  onUploaded,
+  onBusy,
+  onClear,
+}: {
+  url: string;
+  name: string;
+  onUploaded: (url: string, name: string) => void;
+  onBusy: (busy: boolean) => void;
+  onClear: () => void;
+}) {
+  const [state, setState] = useState<"idle" | "uploading" | "error">("idle");
+  const [msg, setMsg] = useState("");
+  const [over, setOver] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function handle(file?: File) {
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      setState("error");
+      setMsg("That file is too big. Max 4 MB.");
+      return;
+    }
+    setState("uploading");
+    setMsg("");
+    onBusy(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.url) throw new Error(json?.error || "Upload failed");
+      onUploaded(json.url, file.name);
+      setState("idle");
+    } catch (e) {
+      setState("error");
+      setMsg(e instanceof Error ? e.message : "Upload failed. Try again.");
+    } finally {
+      onBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="mt-3">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/svg+xml,application/pdf"
+        className="hidden"
+        onChange={(e) => handle(e.target.files?.[0])}
+      />
+
+      {url ? (
+        <div className="flex items-center gap-3 rounded-md border border-[#262627] bg-[#262627]/10 px-3 py-2.5">
+          <Check className="size-5 shrink-0" />
+          <span className="flex-1 truncate text-base">{name || "Logo uploaded"}</span>
+          <button
+            type="button"
+            aria-label="Remove file"
+            onClick={onClear}
+            className="rounded p-1 transition-colors hover:bg-black/10"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled={state === "uploading"}
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setOver(true);
+          }}
+          onDragLeave={() => setOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setOver(false);
+            handle(e.dataTransfer.files?.[0]);
+          }}
+          className={`flex w-full flex-col items-center gap-1.5 rounded-md border-2 border-dashed px-4 py-6 text-center transition-colors duration-300 ${
+            over
+              ? "border-[#262627] bg-[#262627]/10"
+              : "border-[#262627]/30 hover:border-[#262627]/60 hover:bg-[#262627]/5"
+          }`}
+        >
+          {state === "uploading" ? (
+            <>
+              <Loader2 className="size-6 animate-spin" />
+              <span className="text-base">Uploading…</span>
+            </>
+          ) : (
+            <>
+              <Upload className="size-6" />
+              <span className="text-base font-medium">Choose a file or drop it here</span>
+              <span className="text-sm text-[#262627]/60">PNG, JPG, SVG or PDF · max 4 MB</span>
+            </>
+          )}
+        </button>
+      )}
+
+      {state === "error" && (
+        <p role="alert" className="mt-2 text-sm text-red-700">
+          {msg}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -129,6 +292,9 @@ type QuestionProps = {
   onText: (v: string) => void;
   onOther: (v: string) => void;
   onChoose: (option: string) => void;
+  onFile: (url: string, name: string) => void;
+  onBusy: (busy: boolean) => void;
+  onClearFile: () => void;
   onNext: () => void;
 };
 
@@ -143,8 +309,12 @@ export function Question({
   onText,
   onOther,
   onChoose,
+  onFile,
+  onBusy,
+  onClearFile,
   onNext,
 }: QuestionProps) {
+  const [currency, setCurrency] = useState<Currency>(DEFAULT_CURRENCY);
   const value = answers[step.id];
   const selected = (opt: string) =>
     Array.isArray(value) ? value.includes(opt) : value === opt;
@@ -194,11 +364,34 @@ export function Question({
           </Rise>
         )}
 
+        {/* [USD | NPR] toggle above the budget options */}
+        {!isTextual && step.prices && (
+          <Rise className="mt-6">
+            <CurrencyToggle value={currency} onChange={setCurrency} />
+          </Rise>
+        )}
+
         {!isTextual && (
-          <motion.div variants={list} className="mt-8 flex max-w-md flex-col gap-2.5">
+          <motion.div
+            variants={list}
+            className={`${step.prices ? "mt-4" : "mt-8"} flex max-w-md flex-col gap-2.5`}
+          >
             {step.options!.map((opt, i) => {
               const on = selected(opt);
               const showOther = on && opt === step.other;
+              const showUpload = on && opt === step.upload;
+              const desc = step.descriptions?.[opt];
+
+              // budget options show the chosen currency big and the other one small
+              let main = opt;
+              let side: string | undefined;
+              if (step.prices) {
+                const p = step.prices[i];
+                main = currency === "USD" ? p.usd : p.npr;
+                const other = currency === "USD" ? p.npr : p.usd;
+                side = other === main ? undefined : other;
+              }
+
               return (
                 <motion.div key={opt} variants={rise}>
                   <motion.button
@@ -207,22 +400,57 @@ export function Question({
                     whileHover={{ x: 4 }}
                     whileTap={{ scale: 0.97 }}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className={`flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-left text-lg transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#262627] ${on
-                      ? "border-[#262627] bg-[#262627]/10"
-                      : "border-[#262627]/30 bg-[#262627]/4 hover:bg-[#262627]/10"
-                      }`}
+                    className={`flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-left text-lg transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#262627] ${
+                      on
+                        ? "border-[#262627] bg-[#262627]/10"
+                        : "border-[#262627]/30 bg-[#262627]/4 hover:bg-[#262627]/10"
+                    }`}
                   >
                     <motion.span
                       animate={{ scale: on ? [1, 1.3, 1] : 1 }}
                       transition={{ duration: 0.35, ease: EASE }}
-                      className={`inline-flex size-6 shrink-0 items-center justify-center rounded border text-xs font-semibold transition-colors duration-300 ${on
-                        ? "border-[#262627] bg-[#262627] text-white"
-                        : "border-[#262627]/40 bg-white"
-                        }`}
+                      className={`inline-flex size-6 shrink-0 items-center justify-center rounded border text-xs font-semibold transition-colors duration-300 ${
+                        on
+                          ? "border-[#262627] bg-[#262627] text-white"
+                          : "border-[#262627]/40 bg-white"
+                      }`}
                     >
                       {String.fromCharCode(65 + i)}
                     </motion.span>
-                    <span className="flex-1">{opt}</span>
+
+                    <span className="min-w-0 flex-1">
+                      {step.prices ? (
+                        <motion.span
+                          key={`${currency}-${i}`}
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.25, ease: EASE }}
+                          className="block"
+                        >
+                          {main}
+                        </motion.span>
+                      ) : (
+                        <span className="block">{main}</span>
+                      )}
+                      {desc && (
+                        <span className="mt-0.5 block text-sm leading-snug text-[#262627]/55">
+                          {desc}
+                        </span>
+                      )}
+                    </span>
+
+                    {side && (
+                      <motion.span
+                        key={`${currency}-side-${i}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="shrink-0 text-sm text-[#262627]/50"
+                      >
+                        {side}
+                      </motion.span>
+                    )}
+
                     <AnimatePresence>
                       {on && (
                         <motion.span
@@ -254,6 +482,26 @@ export function Question({
                           onChange={(e) => onOther(e.target.value)}
                           placeholder="Tell me what it is…"
                           className={`${lineInput} mt-3 text-lg`}
+                        />
+                      </motion.div>
+                    )}
+
+                    {/* "Upload it now" → file picker slides open */}
+                    {showUpload && (
+                      <motion.div
+                        key="upload"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.4, ease: EASE }}
+                        className="overflow-hidden"
+                      >
+                        <FileDrop
+                          url={(answers[fileKey(step.id)] as string) ?? ""}
+                          name={(answers[fileNameKey(step.id)] as string) ?? ""}
+                          onUploaded={onFile}
+                          onBusy={onBusy}
+                          onClear={onClearFile}
                         />
                       </motion.div>
                     )}
@@ -402,14 +650,15 @@ export function Done({
           through sooner? Pick a time that suits you.
         </p>
       </Rise>
-      <Rise className="mt-8 gap-4">
-        <Button
-          size="lg"
-          onClick={onBook}
-          className="h-12 gap-2 rounded-lg bg-[#262627] px-6 text-base font-semibold text-white transition-transform hover:bg-[#262627]/85 active:scale-95"
-        >
-          <House className="size-5" /> Go to HomePage
-        </Button>
+      <Rise className="mt-8 flex flex-wrap gap-4">
+        <Link href="/">
+          <Button
+            size="lg"
+            className="h-12 gap-2 rounded-lg bg-[#262627] px-6 text-base font-semibold text-white transition-transform hover:bg-[#262627]/85 active:scale-95"
+          >
+            <House className="size-5" /> Go to HomePage
+          </Button>
+        </Link>
         <Button
           size="lg"
           onClick={onBook}

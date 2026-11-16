@@ -10,7 +10,9 @@ const FIELDS = [
   "services",
   "features",
   "presence",
+  "presenceEmail",
   "branding",
+  "logo",
   "budget",
   "timeline",
   "notes",
@@ -29,11 +31,6 @@ export async function POST(req: Request) {
   }
 
   const url = process.env.SHEETS_WEBHOOK_URL;
-  console.log("Sheets configuration:", {
-    urlConfigured: Boolean(url),
-    secretConfigured: Boolean(process.env.SHEETS_SECRET),
-    secretLength: process.env.SHEETS_SECRET?.length ?? 0,
-  });
   if (!url) {
     console.error("SHEETS_WEBHOOK_URL is missing. Add it to .env.local and restart `npm run dev`.");
     return NextResponse.json({ ok: false, error: "Not configured" }, { status: 500 });

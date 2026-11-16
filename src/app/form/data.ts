@@ -8,6 +8,9 @@ export const CAL_LINK = process.env.NEXT_PUBLIC_CAL_LINK ?? "your-username/30min
 // only show the "Pick a time" button).
 export const AUTO_OPEN_BOOKING = true;
 
+export type Currency = "USD" | "NPR";
+export const DEFAULT_CURRENCY: Currency = "USD";
+
 export type StepType = "text" | "email" | "tel" | "long" | "single" | "multi";
 
 export type Step = {
@@ -22,12 +25,42 @@ export type Step = {
   exclusive?: string;
   /** an option from `options` that reveals a text box when picked (e.g. "Something else") */
   other?: string;
+  /** an option from `options` that reveals a file picker (e.g. "Upload it now") */
+  upload?: string;
+  /** short plain-language explanation shown under an option, for clueless clients */
+  descriptions?: Record<string, string>;
+  /** adds a USD | NPR toggle. Same order as `options`. */
+  prices?: { usd: string; npr: string }[];
+  /** only show this step when this returns true */
+  showIf?: (answers: Answers) => boolean;
 };
 
 export type Answers = Record<string, string | string[]>;
 
-// where the typed "other" text is kept inside the answers object
+// extra values kept inside the answers object next to a step's own answer
 export const otherKey = (id: string) => `${id}__other`;
+export const fileKey = (id: string) => `${id}__file`; // uploaded file link
+export const fileNameKey = (id: string) => `${id}__filename`;
+export const busyKey = (id: string) => `${id}__busy`; // "1" while uploading
+
+/* --------------------------------- budget --------------------------------- */
+// Rough rate used: 1 USD ≈ NPR 140. Edit the numbers freely.
+const BUDGET = [
+  { usd: "Under $300", npr: "Under NPR 40,000" },
+  { usd: "$300 – $800", npr: "NPR 40,000 – 110,000" },
+  { usd: "$800 – $2,000", npr: "NPR 110,000 – 280,000" },
+  { usd: "$2,000+", npr: "NPR 280,000+" },
+  { usd: "Not sure yet", npr: "Not sure yet" },
+];
+
+/* -------------------------------- conditions ------------------------------ */
+
+const hasPresence = (a: Answers) =>
+  Array.isArray(a.presence) && a.presence.some((o) => o !== "None yet");
+
+const hasLogo = (a: Answers) => a.branding === "Yes, I have a logo";
+
+/* -------------------------------- questions ------------------------------- */
 
 export const STEPS: Step[] = [
   { id: "name", title: "What's your name?", type: "text", required: true, placeholder: "Type your answer here…" },
@@ -48,15 +81,46 @@ export const STEPS: Step[] = [
     hint: "Choose as many as you like.",
     type: "multi",
     required: true,
-    options: ["Website", "Mobile app", "Online store", "Booking system", "Redesign of existing site", "Not sure yet"],
+    options: ["Website", "Mobile app", "Redesign of existing site", "Not sure yet"],
+    exclusive: "Not sure yet",
+    descriptions: {
+      "Not sure yet": "No problem, we'll work it out together.",
+    },
   },
   {
     id: "features",
     title: "Which features matter to you?",
-    hint: "Choose as many as you like.",
+    hint: "Choose as many as you like. Not sure? Pick the last option.",
     type: "multi",
-    options: ["Online booking", "Online payments", "Photo gallery", "Menu / price list", "Contact form & map", "Blog / news", "Admin dashboard", "Multi-language", "Customer login", "Other"],
+    options: [
+      "Online booking",
+      "Online store",
+      "Online payments",
+      "Photo gallery",
+      "Menu / price list",
+      "Contact form & map",
+      "Blog / news",
+      "Admin dashboard",
+      "Multi-language",
+      "Customer login",
+      "Other",
+      "Not sure, help me decide",
+    ],
     other: "Other",
+    exclusive: "Not sure, help me decide",
+    descriptions: {
+      "Online booking": "Customers book their own appointment or table",
+      "Online store": "Sell products and take orders online",
+      "Online payments": "Accept payments on the site",
+      "Photo gallery": "Show your work, food or space",
+      "Menu / price list": "List your services or items with prices",
+      "Contact form & map": "Customers can message you and find you",
+      "Blog / news": "Post updates and articles",
+      "Admin dashboard": "You manage content and orders yourself",
+      "Multi-language": "The site in more than one language",
+      "Customer login": "Customers have their own accounts",
+      "Not sure, help me decide": "No worries, we'll go through it on a call.",
+    },
   },
   {
     id: "presence",
@@ -68,11 +132,29 @@ export const STEPS: Step[] = [
     exclusive: "None yet",
   },
   {
+    id: "presenceEmail",
+    title: "Which email are those accounts under?",
+    hint: "I may need it to get access. Skip if you're not sure or don't have one.",
+    type: "email",
+    placeholder: "name@example.com",
+    showIf: hasPresence,
+  },
+  {
     id: "branding",
-    title: "Do you have a logo and brand colours?",
+    title: "Do you have a logo?",
+    hint: "Brand colours too, if you have them.",
     type: "single",
     required: true,
-    options: ["Yes, ready to go", "Logo only", "No, I'll need help"],
+    options: ["Yes, I have a logo", "No, I'll need one"],
+  },
+  {
+    id: "logo",
+    title: "How would you like to share your logo?",
+    type: "single",
+    required: true,
+    options: ["Upload it now", "I'll WhatsApp it later"],
+    upload: "Upload it now",
+    showIf: hasLogo,
   },
   {
     id: "budget",
@@ -80,7 +162,8 @@ export const STEPS: Step[] = [
     hint: "An honest range helps me suggest the right approach.",
     type: "single",
     required: true,
-    options: ["Under $300", "$300 – $800", "$800 – $2,000", "$2,000+", "Not sure yet"],
+    options: BUDGET.map((b) => (b.usd === b.npr ? b.usd : `${b.usd} / ${b.npr}`)),
+    prices: BUDGET,
   },
   {
     id: "timeline",
@@ -97,6 +180,10 @@ export const STEPS: Step[] = [
     placeholder: "Type your answer here…",
   },
 ];
+
+/** The steps that apply to the answers given so far. */
+export const visibleSteps = (answers: Answers) =>
+  STEPS.filter((s) => !s.showIf || s.showIf(answers));
 
 /* ------------------------------- helpers ---------------------------------- */
 
@@ -121,21 +208,31 @@ export function validate(step: Step, answers: Answers): string | null {
     const text = (answers[otherKey(step.id)] as string | undefined) ?? "";
     if (!text.trim()) return "Please type what it is";
   }
+  if (step.upload && isSelected(v, step.upload)) {
+    if (answers[busyKey(step.id)] === "1") return "Please wait for the upload to finish";
+    if (!answers[fileKey(step.id)]) {
+      return "Please upload your logo, or choose WhatsApp later";
+    }
+  }
   return null;
 }
 
 /** Turns answers into the flat object that is sent to the spreadsheet.
- *  "Something else" becomes "Something else: <what they typed>". */
+ *  "Something else" becomes "Something else: <typed text>", and an uploaded
+ *  file becomes its Drive link. Steps that were skipped are left out. */
 export function buildPayload(answers: Answers): Answers {
   const out: Answers = {};
-  for (const step of STEPS) {
+  for (const step of visibleSteps(answers)) {
     const v = answers[step.id];
     if (v === undefined) continue;
     const text = ((answers[otherKey(step.id)] as string | undefined) ?? "").trim();
+
     if (step.other && text && isSelected(v, step.other)) {
       out[step.id] = Array.isArray(v)
         ? v.map((o) => (o === step.other ? `${o}: ${text}` : o))
         : `${v}: ${text}`;
+    } else if (step.upload && isSelected(v, step.upload)) {
+      out[step.id] = (answers[fileKey(step.id)] as string) || (v as string);
     } else {
       out[step.id] = v;
     }
