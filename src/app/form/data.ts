@@ -46,10 +46,11 @@ export const busyKey = (id: string) => `${id}__busy`; // "1" while uploading
 /* --------------------------------- budget --------------------------------- */
 // Rough rate used: 1 USD ≈ NPR 140. Edit the numbers freely.
 const BUDGET = [
-  { usd: "Under $300", npr: "Under NPR 40,000" },
-  { usd: "$300 – $800", npr: "NPR 40,000 – 110,000" },
-  { usd: "$800 – $2,000", npr: "NPR 110,000 – 280,000" },
-  { usd: "$2,000+", npr: "NPR 280,000+" },
+  { usd: "Under $150", npr: "Under NPR 25,000" },
+  { usd: "$150 – $300", npr: "NPR 25,000 – 45,900" },
+  { usd: "$300 – $500", npr: "NPR 45,900 – 76,500" },
+  { usd: "$500 – $750", npr: "NPR 60,000 – 100,000" },
+  { usd: "$750 and more", npr: "NPR 1,00,000 and more" },
   { usd: "Not sure yet", npr: "Not sure yet" },
 ];
 
